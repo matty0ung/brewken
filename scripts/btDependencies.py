@@ -1235,6 +1235,7 @@ def installDependencies():
    btExecute.abortOnRunFail(subprocess.run(['cmake', '--build', 'build', '--config', 'Release', '--parallel', '4']))
    btExecute.abortOnRunFail(subprocess.run(['cmake', '--install', './build', '--prefix', './build/dist', '--config', 'Release', '--verbose', '--component', 'sourcemeta_core']))
    btExecute.abortOnRunFail(subprocess.run(['cmake', '--install', './build', '--prefix', './build/dist', '--config', 'Release', '--verbose', '--component', 'sourcemeta_core_dev']))
+   btExecute.abortOnRunFail(subprocess.run(['cmake', '--install', './build', '--prefix', './build/dist', '--config', 'Release', '--verbose', '--component', 'sourcemeta_core_regex']))
    btExecute.abortOnRunFail(subprocess.run(['cmake', '--install', './build', '--prefix', './build/dist', '--config', 'Release', '--verbose', '--component', 'sourcemeta_blaze']))
    btExecute.abortOnRunFail(subprocess.run(['cmake', '--install', './build', '--prefix', './build/dist', '--config', 'Release', '--verbose', '--component', 'sourcemeta_blaze_dev']))
 
