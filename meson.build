@@ -671,8 +671,8 @@ blazeLibNamesOrdered = [
    'sourcemeta_blaze_foundation',
    'sourcemeta_core_numeric',
    'sourcemeta_core_regex',
-   'pcre2',
-   'sljit',
+#   'pcre2',
+#   'sljit',
    'sourcemeta_core_uri',
    'sourcemeta_core_ip',
    'sourcemeta_core_io',
@@ -683,14 +683,14 @@ blazeLibPaths = []
 foreach name : blazeLibNamesOrdered
    blazeLibPaths += join_paths(blazeLibDir, 'lib' + name + '.a')
 endforeach
-blazeLibMimallocPath = join_paths(blazeLibDir, 'libmimalloc.a')
-blazeDependencies = declare_dependency(
-   link_args: ['-Wl,--start-group'] + blazeLibPaths + ['-Wl,--end-group',
-                                                       '-Wl,--push-state,--whole-archive',
-                                                       blazeLibMimallocPath,
-                                                       '-Wl,--pop-state'],
-   include_directories: include_directories('third-party/blaze/build/dist/include'),
-)
+#blazeLibMimallocPath = join_paths(blazeLibDir, 'libmimalloc.a')
+#blazeDependencies = declare_dependency(
+#   link_args: ['-Wl,--start-group'] + blazeLibPaths + ['-Wl,--end-group',
+#                                                       '-Wl,--push-state,--whole-archive',
+#                                                       blazeLibMimallocPath,
+#                                                       '-Wl,--pop-state'],
+#   include_directories: include_directories('third-party/blaze/build/dist/include'),
+#)
 
 #
 # In theory we can get CMake to do the dependencies for us, along the following lines, but we haven't yet managed to get
