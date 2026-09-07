@@ -1238,10 +1238,10 @@ def installDependencies():
    btExecute.abortOnRunFail(subprocess.run(['cmake', '--install', './build', '--prefix', './build/dist', '--config', 'Release', '--verbose', '--component', 'sourcemeta_blaze']))
    btExecute.abortOnRunFail(subprocess.run(['cmake', '--install', './build', '--prefix', './build/dist', '--config', 'Release', '--verbose', '--component', 'sourcemeta_blaze_dev']))
 
-   blazeLibDirOutput = btExecute.abortOnRunFail(
-      subprocess.run(['ls', '-l', './dist/lib'], encoding = "utf-8", capture_output = True)
+   btLogger.log.debug('Directory tree of ' + blazeDir.joinpath('build/dist').as_posix())
+   btExecute.abortOnRunFail(
+      subprocess.run(['tree', '-sh', blazeDir.joinpath('build/dist').as_posix()], capture_output=False)
    )
-   btLogger.log.debug('Blaze libs: ' + blazeLibDirOutput.stdout)
 
    btLogger.log.info('*** Finished checking / installing dependencies ***')
    return
