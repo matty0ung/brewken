@@ -667,6 +667,22 @@ blazeDependencies = dependency('Blaze',
                                            'sourcemeta::blaze::compiler',
                                            'sourcemeta::blaze::evaluator',
                                            'sourcemeta::blaze::output' ],
+                               # Blaze components are
+                               #   - alterschema
+                               #   - bundle
+                               #   - canonicalizer
+                               #   - codegen
+                               #   - compiler
+                               #   - configuration
+                               #   - editor
+                               #   - evaluator
+                               #   - format
+                               #   - foundation
+                               #   - output
+                               #   - test
+                               components : ['compiler',
+                                             'evaluator',
+                                             'output'],
                                required : true)
 
 #==================================================== Other headers ====================================================
