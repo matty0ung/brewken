@@ -1255,10 +1255,10 @@ def installDependencies():
    btExecute.abortOnRunFail(subprocess.run(['sudo', 'cmake', '--install', './build', '--config', 'Release', '--verbose', '--component', 'sourcemeta_blaze']))
    btExecute.abortOnRunFail(subprocess.run(['sudo', 'cmake', '--install', './build', '--config', 'Release', '--verbose', '--component', 'sourcemeta_blaze_dev']))
 
-   btLogger.log.debug('Directory tree of ' + blazeDir.joinpath('build/dist').as_posix())
-   btExecute.abortOnRunFail(
-      subprocess.run(['tree', '-sh', blazeDir.joinpath('build/dist').as_posix()], capture_output=False)
-   )
+###   btLogger.log.debug('Directory tree of ' + blazeDir.joinpath('build/dist').as_posix())
+###   btExecute.abortOnRunFail(
+###      subprocess.run(['tree', '-sh', blazeDir.joinpath('build/dist').as_posix()], capture_output=False)
+###   )
 
    btLogger.log.info('*** Finished checking / installing dependencies ***')
    return
