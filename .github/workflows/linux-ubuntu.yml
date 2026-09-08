@@ -98,12 +98,24 @@ jobs:
           export QT_QPA_PLATFORM=offscreen
           meson test
 
+      #
+      # As explained at https://hnsws.blogspot.com/2026/05/openspace-builds-on-github-actions.html, it's possible for a
+      # highly parallel CMake build to run out of memory on a GitHub Action runner.  You'll see output along the
+      # following lines:
+      #
+      #    gmake[2]: *** [ CMakeFiles/btobjlib.dir/build.make:239: CMakeFiles/btobjlib.dir/src/Algorithms.cpp.o ] Terminated
+      #    gmake[1]: *** [ CMakeFiles/Makefile2:206: CMakeFiles/btobjlib.dir/all ] Terminated
+      #    gmake: *** [ Makefile:146: all ] Terminated
+      #    Error: Process completed with exit code 143.
+      #
+      # Hence, we limit parallelism below
+      #
       - name: Build (with CMake)
         id: cmake-build
         working-directory: ${{github.workspace}}/build
         shell: bash
         run: |
-           cmake --build . --parallel
+           cmake --build . --parallel 3
 
       - name: Test (via CMake)
         id: cmake-test
