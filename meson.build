@@ -647,18 +647,26 @@ message('OpenSSL Library:', openSslDependency.name(), 'found =', openSslDependen
 #
 #    git submodule update --remote
 #
-blazeLibDir = join_paths(meson.project_source_root(), 'third-party/blaze/build/dist/lib')
+# CMAKE_PREFIX_PATH is a "Semicolon-separated list of directories specifying installation prefixes to be searched by the
+# find_package(), find_program(), find_library(), find_file(), and find_path() commands. Each command will add
+# appropriate subdirectories (like bin, lib, or include) as specified in its own documentation."
+#
+# CMAKE_MODULE_PATH is a "semicolon-separated list of directories, represented using forward slashes, specifying a
+# search path for CMake modules to be loaded by the include() or find_package() commands before checking the default
+# modules that come with CMake".  What this means is that it's a place CMake looks for a FindFoobar.cmake file when you
+# invoke find_package(Foobar).  If you don't have a FindFoobar.cmake file, you should instead use CMAKE_PREFIX_PATH to
+# provide the path to a directory containing FoobarConfig.cmake or foobar-config.cmake.
+#
+# In theory we can pass one or both of these paths to CMake via the poorly-documented `cmake_args` option.  In practice,
+# I have not been able to get this working.  So, per comments in scripts/btDependencies.py, we assume here that Blaze is
+# installed system-wide, and thus CMake does not need any special info to find it.
+#
 blazeDependencies = dependency('Blaze',
                                method : 'cmake',
                                modules : [ 'sourcemeta::core::json',
                                            'sourcemeta::blaze::compiler',
                                            'sourcemeta::blaze::evaluator',
                                            'sourcemeta::blaze::output' ],
-                               cmake_args : [
-                                  '-DCMAKE_PREFIX_PATH=' +
-                                  join_paths(blazeLibDir, 'cmake/blaze') + ';' +
-                                  join_paths(blazeLibDir, 'cmake/core') + ';'
-                               ],
                                required : true)
 
 #==================================================== Other headers ====================================================

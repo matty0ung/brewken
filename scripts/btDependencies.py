@@ -1237,10 +1237,19 @@ def installDependencies():
    # I don't think we need to build clang_format_test, and it gives errors on Windows, so commented out for now.
 #   btExecute.abortOnRunFail(subprocess.run(['cmake', '--build', './build', '--config', 'Release', '--target', 'clang_format_test']))
    btExecute.abortOnRunFail(subprocess.run(['cmake', '--build', 'build', '--config', 'Release', '--parallel', '4']))
-   btExecute.abortOnRunFail(subprocess.run(['cmake', '--install', './build', '--prefix', './build/dist', '--config', 'Release', '--verbose', '--component', 'sourcemeta_core']))
-   btExecute.abortOnRunFail(subprocess.run(['cmake', '--install', './build', '--prefix', './build/dist', '--config', 'Release', '--verbose', '--component', 'sourcemeta_core_dev']))
-   btExecute.abortOnRunFail(subprocess.run(['cmake', '--install', './build', '--prefix', './build/dist', '--config', 'Release', '--verbose', '--component', 'sourcemeta_blaze']))
-   btExecute.abortOnRunFail(subprocess.run(['cmake', '--install', './build', '--prefix', './build/dist', '--config', 'Release', '--verbose', '--component', 'sourcemeta_blaze_dev']))
+   #
+   # In Blaze's own nightly builds, they use the `--prefix ./build/dist` option to "install" to a subdirectory of the
+   # build directory.  This is attractive, given that Blaze is a static library and we don't inherently need to install
+   # it system-wide.  However, it's problematic to get Meson to pass the right arguments to CMake (when we use
+   # `depencency()` in meson.build).  The only reliable way I've found to do it is globally via an extra command-line
+   # argument to meson setup (eg `meson setup mbuild -Dcmake_prefix_path=$(pwd)/third-party/blaze/build/dist`).  This
+   # seems a bit clunky.  So, for now at least, we let cmake install Blaze to "standard" locations, then the Meson
+   # invocation of CMake to find the libraries works without any additional magic.
+   #
+   btExecute.abortOnRunFail(subprocess.run(['cmake', '--install', './build', '--config', 'Release', '--verbose', '--component', 'sourcemeta_core']))
+   btExecute.abortOnRunFail(subprocess.run(['cmake', '--install', './build', '--config', 'Release', '--verbose', '--component', 'sourcemeta_core_dev']))
+   btExecute.abortOnRunFail(subprocess.run(['cmake', '--install', './build', '--config', 'Release', '--verbose', '--component', 'sourcemeta_blaze']))
+   btExecute.abortOnRunFail(subprocess.run(['cmake', '--install', './build', '--config', 'Release', '--verbose', '--component', 'sourcemeta_blaze_dev']))
 
    btLogger.log.debug('Directory tree of ' + blazeDir.joinpath('build/dist').as_posix())
    btExecute.abortOnRunFail(

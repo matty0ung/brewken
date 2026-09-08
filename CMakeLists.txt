@@ -704,20 +704,6 @@ find_package(CURL REQUIRED)
 endif()
 
 #================================================== Sourcemeta Blaze ===================================================
-#
-# CMAKE_PREFIX_PATH is a "Semicolon-separated list of directories specifying installation prefixes to be searched by the
-# find_package(), find_program(), find_library(), find_file(), and find_path() commands. Each command will add
-# appropriate subdirectories (like bin, lib, or include) as specified in its own documentation."
-#
-# CMAKE_MODULE_PATH is a "semicolon-separated list of directories, represented using forward slashes, specifying a
-# search path for CMake modules to be loaded by the include() or find_package() commands before checking the default
-# modules that come with CMake".  What this means is that it's a place CMake looks for a FindFoobar.cmake file when you
-# invoke find_package(Foobar).  If you don't have a FindFoobar.cmake file, you should instead use CMAKE_PREFIX_PATH to
-# provide the path to a directory containing FoobarConfig.cmake or foobar-config.cmake.
-#
-set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "${PROJECT_SOURCE_DIR}/third-party/blaze/build/dist/lib/cmake/blaze")
-set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "${PROJECT_SOURCE_DIR}/third-party/blaze/build/dist/lib/cmake/core")
-message("Before searching for Blaze, CMAKE_PREFIX_PATH is ${CMAKE_PREFIX_PATH}")
 find_package(Blaze REQUIRED COMPONENTS compiler evaluator)
 find_package(Core REQUIRED COMPONENTS json jsonpointer)
 
