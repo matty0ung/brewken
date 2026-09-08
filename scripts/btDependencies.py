@@ -1217,16 +1217,20 @@ def installDependencies():
       subprocess.run([
          'cmake',
          '-S', '.', '-B', './build',
-         # These are the same flags as used in the Blaze nightly builds -- see
-         # https://github.com/sourcemeta/blaze/blob/main/.github/workflows/ci.yml
+         #
+         # These are mostly the same flags that get explicitly set the Blaze nightly builds -- see
+         # https://github.com/sourcemeta/blaze/blob/main/.github/workflows/ci.yml.  However, there are a few things we
+         # can turn off (eg benchmarks).
+         #
+         # In the native Blaze builds, warnings are treated as errors.  But on some platforms we're using different
+         # (versions of) different compilers.  So it's easier for us to turn them off.
+         #
          '-DCMAKE_BUILD_TYPE:STRING=Release',
          '-DBLAZE_TESTS:BOOL=ON',
-         '-DBLAZE_BENCHMARK:BOOL=ON',
+         '-DBLAZE_BENCHMARK:BOOL=OFF',
          '-DBLAZE_CONTRIB:BOOL=ON',
          '-DBLAZE_DOCS:BOOL=OFF',
          '-DBUILD_SHARED_LIBS:BOOL=OFF',
-         # In the native Blaze builds, warnings are treated as errors.  But on some platforms we're using different
-         # (versions of) different compilers.  So it's easier for us to turn them off.
          '-DCMAKE_COMPILE_WARNING_AS_ERROR:BOOL=OFF',
       ])
    )

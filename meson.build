@@ -648,67 +648,22 @@ message('OpenSSL Library:', openSslDependency.name(), 'found =', openSslDependen
 #    git submodule update --remote
 #
 blazeLibDir = join_paths(meson.project_source_root(), 'third-party/blaze/build/dist/lib')
-blazeLibNamesOrdered = [
-   #
-   # Blaze is built up from lots of modules, including several that are shared with other Sourcemeta projects.  The end
-   # result of compiling it is 50 or so static libraries.  We only need a subset of them (listed below), but working out
-   # which subset was a bit tiresome.  (In a CMake build, CMake can do this work for you by inspecting Blaze's CMake
-   # files, but the Meson integrations down to CMake don't give you the totality of that functionality.)
-   #
-   'sourcemeta_blaze_compiler',
-   'sourcemeta_blaze_evaluator',
-   'sourcemeta_core_json',
-   'sourcemeta_core_jsonpointer',
-   'sourcemeta_core_uritemplate',
-   'sourcemeta_core_email',
-   'sourcemeta_core_dns',
-   'sourcemeta_core_idna',
-   'sourcemeta_core_punycode',
-   'sourcemeta_core_time',
-   'sourcemeta_core_crypto',
-   'sourcemeta_core_css',
-   'sourcemeta_blaze_bundle',
-   'sourcemeta_blaze_foundation',
-   'sourcemeta_core_numeric',
-   'sourcemeta_core_regex',
-#   'pcre2',
-#   'sljit',
-   'sourcemeta_core_uri',
-   'sourcemeta_core_ip',
-   'sourcemeta_core_io',
-   'sourcemeta_core_text',
-   'sourcemeta_core_unicode',
-]
-blazeLibPaths = []
-foreach name : blazeLibNamesOrdered
-   blazeLibPaths += join_paths(blazeLibDir, 'lib' + name + '.a')
-endforeach
-#blazeLibMimallocPath = join_paths(blazeLibDir, 'libmimalloc.a')
-#blazeDependencies = declare_dependency(
-#   link_args: ['-Wl,--start-group'] + blazeLibPaths + ['-Wl,--end-group',
-#                                                       '-Wl,--push-state,--whole-archive',
-#                                                       blazeLibMimallocPath,
-#                                                       '-Wl,--pop-state'],
-#   include_directories: include_directories('third-party/blaze/build/dist/include'),
-#)
-
-#
-# In theory we can get CMake to do the dependencies for us, along the following lines, but we haven't yet managed to get
-# this to work.
-#
-###blazeDependencies = dependency('blaze',
-###                              method : 'cmake',
-###                              modules : [ 'sourcemeta::core::json',
-###                                          'sourcemeta::blaze::compiler',
-###                                          'sourcemeta::blaze::evaluator',
-###                                          'sourcemeta::blaze::output' ],
-###                              cmake_module_path : join_paths(meson.project_source_root(), 'third-party/blaze/build/dist/lib/cmake'),
-###                              required : true)
+blazeDependencies = dependency('Blaze',
+                               method : 'cmake',
+                               modules : [ 'sourcemeta::core::json',
+                                           'sourcemeta::blaze::compiler',
+                                           'sourcemeta::blaze::evaluator',
+                                           'sourcemeta::blaze::output' ],
+                               cmake_args : [
+                                  '-DCMAKE_PREFIX_PATH=' +
+                                  join_paths(blazeLibDir, 'cmake/blaze') + ';' +
+                                  join_paths(blazeLibDir, 'cmake/core') + ';'
+                               ],
+                               required : true)
 
 #==================================================== Other headers ====================================================
 # Other directories to search in for headers.  Meson will barf an error if any of these directories does not exist.
 includeDirs = include_directories('src',
-###                                  'third-party/valijson/include',
                                   'third-party/libbacktrace',
                                   'third-party/blaze/build/dist/include')
 
