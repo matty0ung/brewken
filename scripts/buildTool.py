@@ -1455,11 +1455,11 @@ def doPackage():
          # The macdeployqt executable shipped with Qt does for Mac what windeployqt does for Windows -- see
          # https://doc.qt.io/qt-6/macos-deployment.html#the-mac-deployment-tool
          #
-         # At first glance, you might thanks that, with a few name changes, we might share all the bt code for
-         # macdeployqt and windeployqt.  However, the two programs share _only_ a top-level goal ("automate the process
-         # of creating a deployable [folder / application bundle] that contains [the necessary Qt dependencies]" - ie so
-         # that the end user does not have to install Qt to run our software).  They have completely different
-         # implementations and command line options, so it would be unhelpful to try to treat them identically.
+         # At first glance, you might that, with a few name changes, we might share all the bt code for macdeployqt and
+         # windeployqt.  However, the two programs share _only_ a top-level goal ("automate the process of creating a
+         # deployable [folder / application bundle] that contains [the necessary Qt dependencies]" - ie so that the end
+         # user does not have to install Qt to run our software).  They have completely different implementations and
+         # command line options, so it would be unhelpful to try to treat them identically.
          #
          # With the verbose logging on, you can see that macdeployqt is calling:
          #    - otool (see https://www.unix.com/man-page/osx/1/otool/) to get information about which libraries etc the

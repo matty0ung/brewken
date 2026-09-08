@@ -688,8 +688,7 @@ blazeDependencies = dependency('Blaze',
 #==================================================== Other headers ====================================================
 # Other directories to search in for headers.  Meson will barf an error if any of these directories does not exist.
 includeDirs = include_directories('src',
-                                  'third-party/libbacktrace',
-                                  'third-party/blaze/build/dist/include')
+                                  'third-party/libbacktrace')
 
 #=======================================================================================================================
 #============================================== Extra Apple dependencies ===============================================
