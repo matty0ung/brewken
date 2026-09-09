@@ -624,8 +624,8 @@ sharedLibraryPaths += libxml2LibPaths
 #
 openSslDependency = dependency('OpenSSL',
                                version : '>=3.0.2',
-                               required : true,
-                               static : true)
+                               required : true #,static : true
+                                 )
 #openSslLibPaths = openSslDependency.get_variable(cmake : 'PACKAGE_LIBRARIES')
 message('OpenSSL Library:', openSslDependency.name(), 'found =', openSslDependency.found(),
         'version =', openSslDependency.version())

@@ -297,6 +297,11 @@ def doSetup(setupOption):
          # version of Qt to try this.  As of 2026-09-06, enabling this on Ubuntu 24.04 LTS results in a start-up crash
          # in the Qt code!
 #         '-Db_lto=true', '-Db_lto_threads=0'
+         #
+         # On Windows at least, CMAKE_MODULE_PATH needs to be set for CMake to find
+         # third-party/blaze/cmake/FindCore.cmake
+         #
+         '-Dthird-party/blaze/cmake/FindCore.cmake=' + btFileSystem.dir_gitSubmodules.joinpath('blaze').as_posix()
       ]
       if (platform.system() != 'Linux'):
          #

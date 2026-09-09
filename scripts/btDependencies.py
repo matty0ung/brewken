@@ -1250,11 +1250,11 @@ def installDependencies():
    # seems a bit clunky.  So, for now at least, we let cmake install Blaze to "standard" locations, then the Meson
    # invocation of CMake to find the libraries works without any additional magic.
    #
-   # On Linux, we need sudo to install to the "standard" locations, but "sudo" does not exist on Windows, even in the
-   # MSYS2 environment.
+   # On Linux and Mac, we need sudo to install to the "standard" locations.  However, "sudo" does not exist on Windows,
+   # even in the MSYS2 environment.
    #
    sudoIfNeeded = []
-   if (platform.system() == 'Linux'):
+   if (platform.system() != 'Windows'):
       sudoIfNeeded.append('sudo')
 
    btExecute.abortOnRunFail(subprocess.run(sudoIfNeeded + ['cmake', '--install', './build', '--config', 'Release', '--verbose', '--component', 'sourcemeta_core'     ]))
