@@ -173,7 +173,9 @@
 #                     lumped in with -Wall.)
 #
 #   - prefer_static   We want to try static linking before shared linking because it makes packaging a lot easier on
-#                     Windows and Mac.   NB: This requires meson 0.63.0 or newer.
+#                     Windows and Mac.   NB: This requires meson 0.63.0 or newer.  HOWEVER we don't set this here
+#                     because we don't want static linking on Linux.  (In particular it creates problems with the
+#                     OpenSSL library on Ubuntu 26.04.)  So we set this option in buildTool.py
 #
 #   - buildtype   For the moment at least, I'm not making a distinction between debug and release builds.  Unless we
 #                 find some compelling performance etc reason to do otherwise, my instinct is to have as much diagnostic
@@ -192,7 +194,6 @@ project('brewken', 'cpp',
         meson_version: '>=0.63.0',
         default_options : ['cpp_std=c++23',
                            'warning_level=3',
-                           'prefer_static=true',
                            'buildtype=plain'])
 
 #

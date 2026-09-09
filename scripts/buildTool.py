@@ -298,6 +298,18 @@ def doSetup(setupOption):
          # in the Qt code!
 #         '-Db_lto=true', '-Db_lto_threads=0'
       ]
+      if (platform.system() != 'Linux'):
+         #
+         # On Windows and Mac we prefer static linking as it simplifies packaging.
+         #
+         # On Linux, there is less need for static linking and it actually creates problems in some circumstances --
+         # specifically on Ubuntu 26.04, trying to link OpenSSL statically creates a link dependency on
+         # libjitterentropy.a, which is potentially tiresome to address.  (TBD if installing libjitterentropy3-dev
+         # package would address it or whether you'd have to build the static version of that library from source.  In
+         # any case, it's simpler to just not link statically in the first place.)
+         #
+         additionalMesonOptions.append(['-Dprefer_static=true'])
+
       btExecute.abortOnRunFail(
          subprocess.run([btUtils.exe_meson,
                          "setup",

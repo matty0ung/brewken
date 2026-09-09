@@ -1235,7 +1235,7 @@ def installDependencies():
          #
          # These flags are listed at https://blaze.sourcemeta.com/
          #
-         '-DBLAZE_TEST:BOOL=OFF', # Change to ON to build the Blaze test runner library
+         '-DBLAZE_TEST:BOOL=OFF', # 'ON' would build the Blaze test runner library
       ])
    )
    # I don't think we need to build clang_format_test, and it gives errors on Windows, so commented out for now.
@@ -1250,15 +1250,17 @@ def installDependencies():
    # seems a bit clunky.  So, for now at least, we let cmake install Blaze to "standard" locations, then the Meson
    # invocation of CMake to find the libraries works without any additional magic.
    #
-   btExecute.abortOnRunFail(subprocess.run(['sudo', 'cmake', '--install', './build', '--config', 'Release', '--verbose', '--component', 'sourcemeta_core']))
-   btExecute.abortOnRunFail(subprocess.run(['sudo', 'cmake', '--install', './build', '--config', 'Release', '--verbose', '--component', 'sourcemeta_core_dev']))
-   btExecute.abortOnRunFail(subprocess.run(['sudo', 'cmake', '--install', './build', '--config', 'Release', '--verbose', '--component', 'sourcemeta_blaze']))
-   btExecute.abortOnRunFail(subprocess.run(['sudo', 'cmake', '--install', './build', '--config', 'Release', '--verbose', '--component', 'sourcemeta_blaze_dev']))
+   # On Linux, we need sudo to install to the "standard" locations, but "sudo" does not exist on Windows, even in the
+   # MSYS2 environment.
+   #
+   sudoIfNeeded = []
+   if (platform.system() == 'Linux'):
+      sudoIfNeeded.append('sudo')
 
-###   btLogger.log.debug('Directory tree of ' + blazeDir.joinpath('build/dist').as_posix())
-###   btExecute.abortOnRunFail(
-###      subprocess.run(['tree', '-sh', blazeDir.joinpath('build/dist').as_posix()], capture_output=False)
-###   )
+   btExecute.abortOnRunFail(subprocess.run(sudoIfNeeded + ['cmake', '--install', './build', '--config', 'Release', '--verbose', '--component', 'sourcemeta_core'     ]))
+   btExecute.abortOnRunFail(subprocess.run(sudoIfNeeded + ['cmake', '--install', './build', '--config', 'Release', '--verbose', '--component', 'sourcemeta_core_dev' ]))
+   btExecute.abortOnRunFail(subprocess.run(sudoIfNeeded + ['cmake', '--install', './build', '--config', 'Release', '--verbose', '--component', 'sourcemeta_blaze'    ]))
+   btExecute.abortOnRunFail(subprocess.run(sudoIfNeeded + ['cmake', '--install', './build', '--config', 'Release', '--verbose', '--component', 'sourcemeta_blaze_dev']))
 
    btLogger.log.info('*** Finished checking / installing dependencies ***')
    return
