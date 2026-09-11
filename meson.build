@@ -624,7 +624,7 @@ sharedLibraryPaths += libxml2LibPaths
 #
 openSslDependency = dependency('OpenSSL',
                                version : '>=3.0.2',
-                               required : true #,static : true
+                               required : true ###,static : true
                                  )
 #openSslLibPaths = openSslDependency.get_variable(cmake : 'PACKAGE_LIBRARIES')
 message('OpenSSL Library:', openSslDependency.name(), 'found =', openSslDependency.found(),
@@ -662,6 +662,8 @@ message('OpenSSL Library:', openSslDependency.name(), 'found =', openSslDependen
 # I have not been able to get this working.  So, per comments in scripts/btDependencies.py, we assume here that Blaze is
 # installed system-wide, and thus CMake does not need any special info to find it.
 #
+blazeDir = join_paths(meson.project_source_root(), 'third-party/blaze')
+
 blazeDependencies = dependency('Blaze',
                                method : 'cmake',
                                modules : [ 'sourcemeta::core::json',
@@ -684,6 +686,11 @@ blazeDependencies = dependency('Blaze',
                                components : ['compiler',
                                              'evaluator',
                                              'output'],
+                               #
+                               # On Windows at least, CMAKE_MODULE_PATH needs to be set for CMake to find
+                               # third-party/blaze/cmake/FindCore.cmake
+                               #
+                               cmake_module_path : blazeDir,
                                required : true)
 
 #==================================================== Other headers ====================================================
