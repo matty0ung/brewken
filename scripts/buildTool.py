@@ -308,7 +308,7 @@ def doSetup(setupOption):
          # package would address it or whether you'd have to build the static version of that library from source.  In
          # any case, it's simpler to just not link statically in the first place.)
          #
-         additionalMesonOptions.append(['-Dprefer_static=true'])
+         additionalMesonOptions += ['-Dprefer_static=true']
 
       btExecute.abortOnRunFail(
          subprocess.run([btUtils.exe_meson,
