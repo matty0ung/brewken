@@ -143,7 +143,7 @@ int main(int argc, char **argv) {
     *
     * This must be used with --user-dir pointing at an empty directory, so that the screenshots are taken from a fresh
     * database with just the default content, rather than the user's own data.  See ScreenshotTaker and
-    * docs/manual/screenshots.sh.
+    * scripts/takeScreenshots.py.
     */
    QCommandLineOption const screenshotsOption{
       "screenshots",

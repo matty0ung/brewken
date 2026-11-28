@@ -28,7 +28,7 @@
        <item>
         <widget class="QLabel" name="label_descendant">
          <property name="text">
-          <string>is an descendant of</string>
+          <string>is a descendant of</string>
          </property>
         </widget>
        </item>

@@ -25,7 +25,7 @@ class MainWindow;
  * \brief Generates the screenshots for the user manual (docs/manual).
  *
  *        This is run when the program is started with the --screenshots option (see main.cpp), which in turn is
- *        normally done via docs/manual/screenshots.sh.  The program then starts with a fresh database containing just
+ *        normally done via scripts/takeScreenshots.py.  The program then starts with a fresh database containing just
  *        the default content, and this code builds the example recipe from Chapter 1 of the manual step by step, in
  *        the same way as a user would, taking a screenshot at each point where the manual has one.
  *

@@ -6,7 +6,7 @@ Chapter 1: A Walkthrough::
 The best way to get started is to brew a beer. This chapter takes you through the process of creating your first beer recipe using {app-name}, with a straightforward, step-by-step guide.
 
 Chapter 2: General Concepts::
-This chapter covers the main features of {app-name}, including recipe management, cost reporting, and importing and exporting recipes. It provides an overview of what the application can do and explains how to use its various features.
+This chapter explains how {app-name} organises things: the database, what is shared between recipes, folders, brew logs, snapshots, inventory, and importing and exporting.
 
 Chapter 3: Tools::
 This chapter describes the individual tools available in {app-name}, explaining what each one does and how to use it.

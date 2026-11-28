@@ -27,10 +27,12 @@
 #include <QMessageBox>
 #include <QPixmap>
 #include <QTimer>
+#include <QTreeView>
 #include <QWidget>
 
 #include "BrewLogWidget.h"
 #include "MainWindow.h"
+#include "StockWindow.h"
 #include "PersistentSettings.h"
 #include "database/ObjectStoreWrapper.h"
 #include "editors/EquipmentEditor.h"
@@ -48,9 +50,12 @@
 #include "model/RecipeAdditionHop.h"
 #include "model/RecipeAdditionYeast.h"
 #include "model/RecipeUtils.h"
+#include "model/StockPurchaseFermentable.h"
+#include "model/StockUseIngredient.h"
 #include "model/Style.h"
 #include "model/Water.h"
 #include "model/Yeast.h"
+#include "utils/WindowDistributor.h"
 #include "widgets/RecipeWaterWidget.h"
 
 namespace {
@@ -74,7 +79,10 @@ namespace {
    double  const fermentationTemp_c    {19.0};
    double  const fermentationTime_days {10.0};
    //! Fixed, so that the screenshots don't change every time they are generated
+   QDate   const recipeDate            {2026, 3,  1};
    QDate   const brewDate              {2026, 3, 14};
+   QDate   const stockReceivedDate     {2026, 2, 20};
+   QString const stockSupplier         {"Local homebrew shop"};
 
    //
    // Logical sizes (ie before any scaling from QT_SCALE_FACTOR) of the windows we take screenshots of
@@ -82,6 +90,7 @@ namespace {
    QSize const mainWindowSize     {1600, 1000};
    QSize const equipmentEditorSize{ 900,  540};
    QSize const mashEditorSize     { 960,  700};
+   QSize const stockWindowSize    {1100,  360};
 
    /**
     * \brief Let Qt process pending events (including any zero-length timers and deferred layouts), so that what we grab
@@ -125,12 +134,15 @@ namespace {
       }
 
       /**
-       * \brief Save a screenshot of \c widget as \c fileName in the output directory
+       * \brief Save a screenshot of \c widget (or the given \c region of it, in the widget's own coordinates) as
+       *        \c fileName in the output directory
        */
-      bool shoot(QWidget & widget, QString const & fileName) {
+      bool shoot(QWidget & widget,
+                 QString const & fileName,
+                 QRect const & region = QRect{QPoint{0, 0}, QSize{-1, -1}}) {
          settle();
          QString const filePath = this->m_directory.filePath(fileName);
-         QPixmap const pixmap = widget.grab();
+         QPixmap const pixmap = widget.grab(region);
          if (pixmap.isNull() || !pixmap.save(filePath, "PNG")) {
             qCritical().noquote() << Q_FUNC_INFO << "Unable to save screenshot" << filePath;
             return false;
@@ -188,6 +200,7 @@ namespace {
             qCritical() << Q_FUNC_INFO << "Unable to create recipe";
             return false;
          }
+         recipe->setDate(recipeDate);
          // Collapse the folders of example recipes, so that the new recipe is easy to see in the tree
          mw.treeView_recipe->collapseAll();
          mw.treeView_recipe->header()->resizeSection(0, 200);
@@ -203,7 +216,8 @@ namespace {
          addToRecipe<RecipeAdditionFermentable>(*recipe, *paleMalt   , Measurement::Amount{5.00, kilograms});
          addToRecipe<RecipeAdditionFermentable>(*recipe, *crystalMalt, Measurement::Amount{0.40, kilograms});
 
-         // Step 2 is the boil proper in the standard boil profile that a new recipe gets (see Boil::ensureStandardProfile)
+         // Step 2 is the boil proper in the standard boil profile that a new recipe gets (see
+         // Boil::ensureStandardProfile)
          auto bittering = addToRecipe<RecipeAdditionHop>(*recipe, *bitteringHop, Measurement::Amount{0.035, kilograms});
          bittering->setStage(RecipeAddition::Stage::Boil);
          bittering->setStep(2);
@@ -220,8 +234,8 @@ namespace {
 
          //
          // Mash: use the (locked) example profile, then do what the user does when they click Auto-Adjust in the mash
-         // editor and choose to make a copy.  We make the copy here rather than via the editor, as the editor asks about
-         // it with a message box.
+         // editor and choose to make a copy.  We make the copy here rather than via the editor, as the editor asks
+         // about it with a message box.
          //
          recipe->setMash(exampleMash);
          RecipeUtils::useCopyFor<Mash>(*recipe);
@@ -279,6 +293,25 @@ namespace {
          // Brew day
          //
          //
+         // Stock purchases, for the Inventory screenshot in Chapter 2.  We add them before brewing so that Brew It!
+         // takes the malt from stock, as it would for a user who keeps track of their inventory.
+         //
+         {
+            auto paleMaltPurchase = std::make_shared<StockPurchaseFermentable>();
+            paleMaltPurchase->setIngredient(*paleMalt);
+            paleMaltPurchase->setAmount(Measurement::Amount{25.0, kilograms});
+            paleMaltPurchase->setDateReceived(stockReceivedDate);
+            paleMaltPurchase->setSupplier(stockSupplier);
+            ObjectStoreWrapper::insert(paleMaltPurchase);
+            auto crystalMaltPurchase = std::make_shared<StockPurchaseFermentable>();
+            crystalMaltPurchase->setIngredient(*crystalMalt);
+            crystalMaltPurchase->setAmount(Measurement::Amount{1.0, kilograms});
+            crystalMaltPurchase->setDateReceived(stockReceivedDate);
+            crystalMaltPurchase->setSupplier(stockSupplier);
+            ObjectStoreWrapper::insert(crystalMaltPurchase);
+         }
+
+         //
          // NB: Brew It! acts on the recipe selected in the tree, so we make sure that is our recipe.
          //
          mw.treeView_recipe->setSelected(mw.treeView_recipe->findElement(recipe.get()));
@@ -296,6 +329,12 @@ namespace {
             return false;
          }
          brewLog->setBrewDate(brewDate);
+         // Brew It! records the stock it uses with today's date, so we change that to the brew date too
+         for (auto stockUse : ObjectStoreWrapper::findAllMatching<StockUseFermentable>(
+            [&brewLog](std::shared_ptr<StockUseFermentable> su) { return su->brewLogId() == brewLog->key(); }
+         )) {
+            stockUse->setDate(brewDate);
+         }
          brewLog->setName("BB-01");
          // Plausible measurements, a little short of what the recipe predicted
          brewLog->setMeasuredStrikeTemp_c        (72.5  );
@@ -307,6 +346,50 @@ namespace {
          brewLog->setMeasuredVolumeIntoFv_l      (24.5  );
          brewLog->setMeasuredPitchTemp_c         (18.0  );
          if (!this->shoot(*mw.tabWidget_recipeView, "brewLog.png")) { return false; }
+
+         //
+         // Chapter 2: automatic snapshots.  With them turned on, the first change to a recipe after it has been brewed
+         // takes a snapshot of the recipe as brewed (and moves the brew log to the snapshot).
+         //
+         RecipeUtils::setAutomaticVersioningEnabled(true);
+         aroma->setAmount(Measurement::Amount{0.035, kilograms});
+         settle();
+         // The snapshot is a copy of the recipe, so it gets today's date, which we don't want either.  (We suspend
+         // versioning while we change it, as otherwise changing the snapshot, which now has the brew log, would make a
+         // snapshot of the snapshot!)
+         {
+            RecipeUtils::SuspendRecipeVersioning suspendVersioning;
+            for (auto ancestor : recipe->ancestors()) {
+               ancestor->setDate(recipeDate);
+            }
+         }
+         settle();
+         {
+            QModelIndex const recipeIndex = mw.treeView_recipe->findElement(recipe.get());
+            mw.treeView_recipe->setSelected(recipeIndex);
+            mw.treeView_recipe->showAncestors();
+            settle();
+            mw.treeView_recipe->expandRecursively(mw.treeView_recipe->findElement(recipe.get()));
+            mw.tabWidget_Trees->setCurrentWidget(mw.treeView_recipe);
+            // Just the top of the tree, as that's where everything is
+            if (!this->shoot(*mw.tabWidget_Trees, "recipeTree.png", QRect{0, 0, 420, 300})) { return false; }
+         }
+
+         //
+         // Chapter 2: the Inventory window, showing the stock purchases above and what Brew It! took from them
+         //
+         {
+            auto & stockWindow = WindowDistributor::get<StockWindow>();
+            stockWindow.resize(stockWindowSize);
+            stockWindow.show();
+            settle();
+            for (auto treeView : stockWindow.findChildren<QTreeView *>()) {
+               treeView->expandAll();
+               treeView->resizeColumnToContents(0);
+            }
+            if (!this->shoot(stockWindow, "stockWindow.png")) { return false; }
+            stockWindow.hide();
+         }
 
          return true;
       }
